@@ -2,6 +2,8 @@ import pytest
 from network import Network
 #from ..londontube.network import Network #import Network according to the directory structure given in the assignment pdf
 
+#positive tests:
+
 def test_network_n_nodes():
     #test matrix taken from eqn 1 in the assignment pdf
     test_adjacency_matrix = [[0, 1, 0, 3],
@@ -45,7 +47,6 @@ def test_network_add():
     subnetwork_2 = Network(subnetwork_adjacency_matrix_2)
     assert (subnetwork_1 + subnetwork_2).adjacency_matrix == supernetwork_adjacency_matrix
 
-
 @pytest.mark.parametrize("n, v, neighbors", [
     (1, 0, [1,3]), #testing nearest neighbors
     (2, 1, [0, 2, 3]), #testing second-nearest neighbors
@@ -85,5 +86,24 @@ def test_dijkstra(test_adjacency_matrix, start, end, expected_path, expected_cos
     path, cost = test_network.dijkstra(start, end)
     assert path==expected_path and cost==expected_cost
 
-
 # negative tests ensuring that the validity of inputs/raised errors work as expected:
+
+def test_network_add_incompatible():
+    #test matrix taken from eqn 1 in the assignment pdf
+    test_adjacency_matrix_large = [[0, 1, 0, 3],
+                              [1, 0, 2, 1],
+                              [0, 2, 0, 0],
+                              [3, 1, 0, 0 ]]
+    test_network_large = Network(test_adjacency_matrix_large)
+
+    test_adjacency_matrix_small = [[0, 1, 0],
+                               [1, 0, 2],
+                               [0, 2, 0]]
+    test_network_small = Network(test_adjacency_matrix_small)
+
+    with pytest.raises(TypeError, match="Both objects must be instances of Network"):
+        sum_1 = test_network_large + 1 
+    
+    with pytest.raises(ValueError, match="Both networks must have the same number of nodes"):
+        sum_2 = test_network_large + test_network_small
+
