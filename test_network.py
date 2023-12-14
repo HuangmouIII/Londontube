@@ -86,7 +86,7 @@ def test_dijkstra(test_adjacency_matrix, start, end, expected_path, expected_cos
     path, cost = test_network.dijkstra(start, end)
     assert path==expected_path and cost==expected_cost
 
-# negative tests ensuring that the validity of inputs/raised errors work as expected:
+# negative tests ensuring that the errors raised while checking inputs work as expected:
 
 def test_network_add_incompatible():
     #test matrix taken from eqn 1 in the assignment pdf
@@ -107,3 +107,30 @@ def test_network_add_incompatible():
     with pytest.raises(ValueError, match="Both networks must have the same number of nodes"):
         sum_2 = test_network_large + test_network_small
 
+def test_adjacency_matrix_valid():
+    with pytest.raises(ValueError, match="Adjacency matrix must be square."):
+        test_adjacency_matrix = [[0, 1, 0],
+                                 [1, 0, 2],
+                                 [0, 2, 0],
+                                 [3, 1, 0]]
+        test_network = Network(test_adjacency_matrix)
+
+    with pytest.raises(ValueError, match="Adjacency matrix must have non-negative values."):
+        test_adjacency_matrix = [[0, -1, 0, 3],
+                                 [-1, 0, 2, 1],
+                                 [0, 2, 0, 0],
+                                 [3, 1, 0, 0 ]]
+        test_network = Network(test_adjacency_matrix)
+
+    with pytest.raises(ValueError, match="Adjacency matrix must be symmetric for undirected graphs."):
+        test_adjacency_matrix = [[0, 2, 0, 3],
+                                   [1, 0, 2, 1],
+                                   [0, 2, 0, 0],
+                                   [3, 1, 0, 0 ]]
+        test_network = Network(test_adjacency_matrix)
+
+#negative test for distant_neighbors
+    #ValueError("Node index out of bounds")
+
+#negative test for dijkstra 
+    #ValueError("Start or destination node index out of bounds")
