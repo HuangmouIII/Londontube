@@ -64,4 +64,26 @@ def test_distant_neighbours(n, v, neighbors):
 
     assert nearest_neighbours == expected_nearest_neighbors
 
+@pytest.mark.parametrize("test_adjacency_matrix, start, end, expected_path, expected_cost", [
+    ([[0, 1, 0, 3],
+      [1, 0, 2, 1],
+      [0, 2, 0, 0],
+      [3, 1, 0, 0 ]], 0, 2, [0, 1, 2], 3), #testing route from 0 to 2 (using matrix from eqn 1 in the assignment pdf)
+    ([[0, 1, 0, 3],
+      [1, 0, 2, 1],
+      [0, 2, 0, 0],
+      [3, 1, 0, 0 ]], 2, 0, [2, 1, 0], 3), #testing route from 0 to 2 (using matrix from eqn 1 in the assignment pdf)
+    ([[0, 1, 0, 3],
+      [1, 0, 0, 1],
+      [0, 0, 0, 0],
+      [3, 1, 0, 0 ]], 0, 2, None, float('inf')), #testing when no route exists (using matrix from eqn 1 in the assignment pdf with v1-v2 connection severed)
+])
+def test_dijkstra(test_adjacency_matrix, start, end, expected_path, expected_cost):
+    #test matrix taken from eqn 1 in the assignment pdf
+    test_network = Network(test_adjacency_matrix)
+
+    path, cost = test_network.dijkstra(start, end)
+    assert path==expected_path and cost==expected_cost
+
+
 # negative tests ensuring that the validity of inputs/raised errors work as expected:
