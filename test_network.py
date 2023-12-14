@@ -129,8 +129,14 @@ def test_adjacency_matrix_valid():
                                    [3, 1, 0, 0 ]]
         test_network = Network(test_adjacency_matrix)
 
-#negative test for distant_neighbors
-    #ValueError("Node index out of bounds")
+def test_distant_neighbors_input():
+    with pytest.raises(ValueError, match="Node index out of bounds"):
+        test_adjacency_matrix = [[0, 1, 0, 3],
+                                 [1, 0, 2, 1],
+                                 [0, 2, 0, 0],
+                                 [3, 1, 0, 0 ]]
+        test_network = Network(test_adjacency_matrix)
+        nearest_neighbours = test_network.distant_neighbours(1, 4)
 
 #negative test for dijkstra 
     #ValueError("Start or destination node index out of bounds")
