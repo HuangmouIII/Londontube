@@ -138,5 +138,15 @@ def test_distant_neighbors_input():
         test_network = Network(test_adjacency_matrix)
         nearest_neighbours = test_network.distant_neighbours(1, 4)
 
-#negative test for dijkstra 
-    #ValueError("Start or destination node index out of bounds")
+def test_dijkstra_input():
+    test_adjacency_matrix = [[0, 1, 0, 3],
+                             [1, 0, 2, 1],
+                             [0, 2, 0, 0],
+                             [3, 1, 0, 0 ]]
+    test_network = Network(test_adjacency_matrix)
+    
+    with pytest.raises(ValueError, match="Start or destination node index out of bounds"):
+        path, cost = test_network.dijkstra(0, 4)
+
+    with pytest.raises(ValueError, match="Start or destination node index out of bounds"):
+        path, cost = test_network.dijkstra(4, 0)
