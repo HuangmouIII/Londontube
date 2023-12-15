@@ -150,5 +150,57 @@ class Network:
         # Return a new Network object with the combined adjacency matrix
         return Network(combined_matrix)
 
-    
+    def distant_neighbours(self, n, v):
+        """
+        The new method to compute the n-distant neighbours of a particular node v,
+        excluding the node 'v' itself
+
+        Args:
+            n (int): The distance from the node.
+            v (int): The index of the node.
+
+        Returns:
+            list: A list of nodes at distance 'n' from node 'v'.
+
+        Raises:
+            ValueError: If the node index 'v' is out of bounds (v exceeds the total number of nodes).
+
+        """
+
+        # Check if the node index is within the bounds of the network
+        if v >= self.n_nodes:
+            raise ValueError("Node index out of bounds")
+
+        # Initialize a list to keep track of visited nodes; all set to False initially
+        visited = [False] * self.n_nodes
+
+        # Mark the initial node as visited
+        visited[v] = True
+
+        # Set to keep track of nodes in the current level (distance)
+        current_level = {v}
+
+        # Loop to find neighbors at each distance level up to n
+        for _ in range(n):
+            next_level = set()  # Set to hold neighbors of the next level
+            for node in current_level:
+                # Iterate over each neighbor of the current node
+                for neighbor, edge in enumerate(self.adjacency_matrix[node]):
+                    # Check if there is an edge and the neighbor hasn't been visited
+                    if edge > 0 and not visited[neighbor]:
+                        next_level.add(neighbor)  # Add neighbor to the next level
+                        visited[neighbor] = True  # Mark the neighbor as visited
+            current_level = next_level  # Move to the next level
+
+        # If n > 0, the initial node is not a neighbor of itself; remove it
+        if n > 0:
+            visited[v] = False
+
+        # Compile the list of neighbors from the visited flags
+        neighbours = [i for i, reached_node in enumerate(visited) if reached_node]
+
+        # Return the sorted list of neighbors
+        return neighbours
+
+   
 
