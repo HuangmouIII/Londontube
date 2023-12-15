@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>User Guide &#8212; londontube package  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Developer Guide" href="developer_guide.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this heading">¶</a></h1>
+<p>This guide will walk you through the basics of using LondonTube to navigate the network.</p>
+<section id="basic-usage">
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">londontube.network</span> <span class="kn">import</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">londontube.web_query</span> <span class="kn">import</span> <span class="n">query_line_connectivity</span>
+<span class="c1"># All stations for the special line</span>
+<span class="kn">from</span> <span class="nn">londontube.web_query</span> <span class="kn">import</span> <span class="n">station_information</span>
+<span class="c1"># Station information</span>
+<span class="kn">from</span> <span class="nn">londontube.web_query</span> <span class="kn">import</span> <span class="n">update_matrix_disruption</span>
+<span class="c1"># Update matrix information for disruption</span>
+</pre></div>
+</div>
+</section>
+<section id="network-class-user-guide">
+<h2>Network Class User Guide<a class="headerlink" href="#network-class-user-guide" title="Permalink to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Network</span></code> class is designed to represent and manipulate networks represented by adjacency matrices. Below are details of the class methods and their usage.</p>
+<section id="constructor">
+<h3>Constructor<a class="headerlink" href="#constructor" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">__init__(self,</span> <span class="pre">adjacency_matrix)</span></code>
+Initializes a <code class="docutils literal notranslate"><span class="pre">Network</span></code> object with the given adjacency matrix.
+:param adjacency_matrix: A square matrix representing the network’s adjacency.</p></li>
+</ul>
+</section>
+<section id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>
+Returns the number of nodes in the network.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adjacency_matrix</span></code>
+Returns the adjacency matrix of the network. It checks for squareness, non-negative values, and symmetry (for undirected graphs).</p></li>
+</ul>
+</section>
+<section id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">__add__(self,</span> <span class="pre">other)</span></code>
+Combines two networks into a single network. The method merges adjacency matrices by taking the minimum non-zero value at each position.
+:param other: Another <code class="docutils literal notranslate"><span class="pre">Network</span></code> object to combine with.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">distant_neighbours(self,</span> <span class="pre">n,</span> <span class="pre">v)</span></code>
+Finds neighbours at a distance ‘n’ from a given node ‘v’.
+:param n: The distance level.
+:param v: The node index to start from.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dijkstra(self,</span> <span class="pre">start,</span> <span class="pre">destination)</span></code>
+Implements Dijkstra’s algorithm to find the shortest path between two nodes.
+:param start: The starting node index.
+:param destination: The destination node index.
+:returns: A tuple containing the shortest path and its total cost.</p></li>
+</ul>
+</section>
+</section>
+<section id="network-class-usage-examples">
+<h2>Network Class Usage Examples<a class="headerlink" href="#network-class-usage-examples" title="Permalink to this heading">¶</a></h2>
+<section id="creating-a-network-object">
+<h3>Creating a Network Object<a class="headerlink" href="#creating-a-network-object" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">adjacency_matrix</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="n">network</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+<span class="c1"># results: [[0, 1, 0], [1, 0, 1], [0, 1, 0]]</span>
+</pre></div>
+</div>
+</section>
+<section id="combining-networks">
+<h3>Combining Networks<a class="headerlink" href="#combining-networks" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">network1</span> <span class="o">=</span> <span class="n">Network</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="n">network2</span> <span class="o">=</span> <span class="n">Network</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="n">combined_network</span> <span class="o">=</span> <span class="n">network1</span> <span class="o">+</span> <span class="n">network2</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">combined_network</span><span class="o">.</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+<span class="c1"># results: [[0, 1, 0, 3], [1, 0, 2, 1], [0, 2, 0, 0], [3, 1, 0, 0]]</span>
+</pre></div>
+</div>
+</section>
+<section id="finding-distant-neighbours">
+<h3>Finding Distant Neighbours<a class="headerlink" href="#finding-distant-neighbours" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">neighbours</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">distant_neighbours</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Finds neighbours of node 0 at distance 1</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">neighbours</span><span class="p">)</span>
+<span class="c1"># results: [1]</span>
+</pre></div>
+</div>
+</section>
+<section id="using-dijkstra-s-algorithm">
+<h3>Using Dijkstra’s Algorithm<a class="headerlink" href="#using-dijkstra-s-algorithm" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">path</span><span class="p">,</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">dijkstra</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Finds shortest path from node 0 to node 2</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
+<span class="c1"># results: [0, 1, 2] 2</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">londontube package</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#network-class-user-guide">Network Class User Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#network-class-usage-examples">Network Class Usage Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="developer_guide.html" title="next chapter">Developer Guide</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Group 07.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/user_guide.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

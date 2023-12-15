@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>network &#8212; londontube package  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for network</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">heapq</span>
+<div class="viewcode-block" id="Network"><a class="viewcode-back" href="../index.html#network.Network">[docs]</a><span class="k">class</span> <span class="nc">Network</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to represent london tube network with an adjacency matrix as the input.</span>
+
+<span class="sd">    This class provides a representation of a network with nodes and edges, </span>
+<span class="sd">    where edges are represented by the weights in the adjacency matrix. </span>
+<span class="sd">    It analyses and plans routes on (an approximation to) the London underground, </span>
+<span class="sd">    accounting for closures and disruptions to the network. </span>
+<span class="sd">    For example, find the shortest path between nodes </span>
+<span class="sd">    and modifying the graph in the case of service disruptions.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        _adjacency_matrix (list of tuple of int): A square matrix representing </span>
+<span class="sd">        the edges between nodes in the network. Each cell [i][j] represents </span>
+<span class="sd">        the edge weight from node i to node j, with 0 indicating no edge, </span>
+<span class="sd">        and a positive integer indicating the edge&#39;s weight.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">        n_nodes: Get the number of nodes in the network.</span>
+<span class="sd">        adjacency_matrix: Retrieve the adjacency matrix.</span>
+<span class="sd">        __add__: Combines two network instances into one by combining their adjacency matrices.</span>
+<span class="sd">        distant_neighbours: Find nodes at a specified distance from a given node.</span>
+<span class="sd">        provided_distant_neighbours: The provided method for finding distant neighbours.</span>
+<span class="sd">        dijkstra: Implements Dijkstra&#39;s algorithm to find the shortest path and corresponding cost between nodes.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; network = Network([[0, 1], [1, 0]])</span>
+<span class="sd">        &gt;&gt;&gt; network.n_nodes</span>
+<span class="sd">        2</span>
+<span class="sd">        &gt;&gt;&gt; network.adjacency_matrix</span>
+<span class="sd">        [[0, 1], [1, 0]]</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The adjacency matrix must be a square matrix with non-negative values. </span>
+<span class="sd">        For undirected graphs or networks, the matrix must also be symmetric.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adjacency_matrix</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the Network with an adjacency matrix.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            adjacency_matrix (list of tuple of int): A square matrix where the </span>
+<span class="sd">            value at adjacency_matrix[i][j] represents the weight of the edge </span>
+<span class="sd">            from node i to node j.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the adjacency matrix is not square, not symmetric, </span>
+<span class="sd">            or contains negative values..</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if the matrix is square</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adjacency_matrix</span> <span class="o">=</span> <span class="n">adjacency_matrix</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjacency_matrix</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adjacency_matrix</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Adjacency matrix must be square.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check for non-negative values</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">cell</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adjacency_matrix</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Adjacency matrix must have non-negative values.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check for symmetry if the graph is undirected</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjacency_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adjacency_matrix</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Adjacency matrix must be symmetric for undirected graphs.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the number of nodes in the network.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The number of nodes.</span>
+<span class="sd">        </span>
+<span class="sd">        Doctest:</span>
+<span class="sd">            &gt;&gt;&gt;</span>
+
+
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjacency_matrix</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">adjacency_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the adjacency matrix of the network.</span>
+
+<span class="sd">        This method validates the matrix to ensure it is square, symmetric </span>
+<span class="sd">        (for undirected graphs), and contains only non-negative weights.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of tuple of int: The adjacency matrix of the network.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the adjacency matrix is not square, not symmetric, </span>
+<span class="sd">            or contains negative values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adjacency_matrix</span>
+
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines the adjacency matrix of this network with another network&#39;s </span>
+<span class="sd">        adjacency matrix. The combined network has an adjacency matrix formed by </span>
+<span class="sd">        taking the element-wise minimum of the adjacency matrices of the sub-networks.</span>
+<span class="sd">        When taking the minimum, values of 0 is ignored due to not existing edge.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other (Network): Another Network object to combine with</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Network: A new Network instance with the combined other (Network).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: If the other object is not an instance of Network.</span>
+<span class="sd">            ValueError: If the networks have a different number of nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check if the other object is also an instance of Network</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Network</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Both objects must be instances of Network&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Ensure both networks have the same number of nodes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both networks must have the same number of nodes&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Initialize an empty list to store the combined adjacency matrix</span>
+        <span class="n">combined_matrix</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Iterate over rows of both adjacency matrices simultaneously</span>
+        <span class="k">for</span> <span class="n">row_self</span><span class="p">,</span> <span class="n">row_other</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adjacency_matrix</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">adjacency_matrix</span><span class="p">):</span>
+            <span class="n">combined_row</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Initialize a new row for the combined matrix</span>
+
+            <span class="c1"># Iterate over elements of both rows simultaneously</span>
+            <span class="k">for</span> <span class="n">val_self</span><span class="p">,</span> <span class="n">val_other</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">row_self</span><span class="p">,</span> <span class="n">row_other</span><span class="p">):</span>
+                <span class="c1"># If one of the values is 0, use the other value (ignoring zeros)</span>
+                <span class="k">if</span> <span class="n">val_self</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">combined_row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_other</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">val_other</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">combined_row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_self</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># If neither value is zero, take the minimum</span>
+                    <span class="n">combined_row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">val_self</span><span class="p">,</span> <span class="n">val_other</span><span class="p">))</span>
+
+            <span class="c1"># Append the combined row to the combined matrix</span>
+            <span class="n">combined_matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">combined_row</span><span class="p">)</span>
+
+        <span class="c1"># Return a new Network object with the combined adjacency matrix</span>
+        <span class="k">return</span> <span class="n">Network</span><span class="p">(</span><span class="n">combined_matrix</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Network.distant_neighbours"><a class="viewcode-back" href="../index.html#network.Network.distant_neighbours">[docs]</a>    <span class="k">def</span> <span class="nf">distant_neighbours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The new method to compute the n-distant neighbours of a particular node v,</span>
+<span class="sd">        excluding the node &#39;v&#39; itself</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (int): The distance from the node.</span>
+<span class="sd">            v (int): The index of the node.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of nodes at distance &#39;n&#39; from node &#39;v&#39;.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the node index &#39;v&#39; is out of bounds (v exceeds the total number of nodes).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check if the node index is within the bounds of the network</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Node index out of bounds&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Initialize a list to keep track of visited nodes; all set to False initially</span>
+        <span class="n">visited</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span>
+
+        <span class="c1"># Mark the initial node as visited</span>
+        <span class="n">visited</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Set to keep track of nodes in the current level (distance)</span>
+        <span class="n">current_level</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">}</span>
+
+        <span class="c1"># Loop to find neighbors at each distance level up to n</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">next_level</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># Set to hold neighbors of the next level</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">current_level</span><span class="p">:</span>
+                <span class="c1"># Iterate over each neighbor of the current node</span>
+                <span class="k">for</span> <span class="n">neighbor</span><span class="p">,</span> <span class="n">edge</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adjacency_matrix</span><span class="p">[</span><span class="n">node</span><span class="p">]):</span>
+                    <span class="c1"># Check if there is an edge and the neighbor hasn&#39;t been visited</span>
+                    <span class="k">if</span> <span class="n">edge</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">visited</span><span class="p">[</span><span class="n">neighbor</span><span class="p">]:</span>
+                        <span class="n">next_level</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">neighbor</span><span class="p">)</span>  <span class="c1"># Add neighbor to the next level</span>
+                        <span class="n">visited</span><span class="p">[</span><span class="n">neighbor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Mark the neighbor as visited</span>
+            <span class="n">current_level</span> <span class="o">=</span> <span class="n">next_level</span>  <span class="c1"># Move to the next level</span>
+
+        <span class="c1"># If n &gt; 0, the initial node is not a neighbor of itself; remove it</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">visited</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Compile the list of neighbors from the visited flags</span>
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">reached_node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">visited</span><span class="p">)</span> <span class="k">if</span> <span class="n">reached_node</span><span class="p">]</span>
+
+        <span class="c1"># Return the sorted list of neighbors</span>
+        <span class="k">return</span> <span class="n">neighbours</span></div>
+
+   
+<div class="viewcode-block" id="Network.dijkstra"><a class="viewcode-back" href="../index.html#network.Network.dijkstra">[docs]</a>    <span class="k">def</span> <span class="nf">dijkstra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">destination</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implement Dijkstra&#39;s algorithm to find the shortest path and its cost from </span>
+<span class="sd">        &#39;start&#39; to &#39;destination&#39;.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            start (int): The index of the start node.</span>
+<span class="sd">            destination (int): The index of the destination node.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing the shortest path as a list of node indices </span>
+<span class="sd">            and the total cost as an integer.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If &#39;start&#39; or &#39;destination&#39; node index exceeds total number of nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span> <span class="ow">or</span> <span class="n">destination</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Start or destination node index out of bounds&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Step 1 &amp; 2: Initialize costs and visited nodes</span>
+        <span class="n">costs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span>
+        <span class="n">costs</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">visited</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span>
+        <span class="n">previous_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span>
+
+        <span class="c1"># Step 3: Set previous node for each node as the start node</span>
+        <span class="n">previous_nodes</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">=</span> <span class="n">start</span>
+
+        <span class="c1"># Step 4: Create a priority queue and add the start node</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="n">start</span><span class="p">)]</span>
+
+        <span class="k">while</span> <span class="n">queue</span><span class="p">:</span>
+            <span class="c1"># Step 9: Select the unvisited node with the smallest tentative cost</span>
+            <span class="n">current_cost</span><span class="p">,</span> <span class="n">current_node</span> <span class="o">=</span> <span class="n">heapq</span><span class="o">.</span><span class="n">heappop</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">visited</span><span class="p">[</span><span class="n">current_node</span><span class="p">]:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Step 6: Mark the current node as visited</span>
+            <span class="n">visited</span><span class="p">[</span><span class="n">current_node</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># Step 7: Check if destination is reached</span>
+            <span class="k">if</span> <span class="n">current_node</span> <span class="o">==</span> <span class="n">destination</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="c1"># Step 5: Consider nearest-neighbours of the current node</span>
+            <span class="k">for</span> <span class="n">neighbor</span><span class="p">,</span> <span class="n">edge_cost</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adjacency_matrix</span><span class="p">[</span><span class="n">current_node</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">edge_cost</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">visited</span><span class="p">[</span><span class="n">neighbor</span><span class="p">]:</span>
+                    <span class="n">new_cost</span> <span class="o">=</span> <span class="n">current_cost</span> <span class="o">+</span> <span class="n">edge_cost</span>
+                    <span class="k">if</span> <span class="n">new_cost</span> <span class="o">&lt;</span> <span class="n">costs</span><span class="p">[</span><span class="n">neighbor</span><span class="p">]:</span>
+                        <span class="n">costs</span><span class="p">[</span><span class="n">neighbor</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_cost</span>
+                        <span class="n">previous_nodes</span><span class="p">[</span><span class="n">neighbor</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_node</span>
+                        <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">queue</span><span class="p">,</span> <span class="p">(</span><span class="n">new_cost</span><span class="p">,</span> <span class="n">neighbor</span><span class="p">))</span>
+
+        <span class="c1"># Step 8: Check if path exists</span>
+        <span class="k">if</span> <span class="n">costs</span><span class="p">[</span><span class="n">destination</span><span class="p">]</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Reconstructing the path</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">destination</span>
+        <span class="k">while</span> <span class="n">node</span> <span class="o">!=</span> <span class="n">start</span><span class="p">:</span>
+            <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">previous_nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">path</span><span class="p">,</span> <span class="n">costs</span><span class="p">[</span><span class="n">destination</span><span class="p">]</span></div></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">londontube package</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide.html">Developer Guide</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Group 07.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
