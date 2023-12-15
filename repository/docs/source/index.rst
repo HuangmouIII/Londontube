@@ -10,6 +10,19 @@ Welcome to londontube package's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   installation
+   user_guide
+   developer_guide
+
+.. automodule:: network 
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: journey-planner 
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 
 Indices and tables
