@@ -1,6 +1,6 @@
 import pytest
-from network import Network
-#from ..londontube.network import Network #import Network according to the directory structure given in the assignment pdf
+#from network import Network
+from ..londontube.network import Network #import Network according to the directory structure given in the assignment pdf
 
 #positive tests:
 
