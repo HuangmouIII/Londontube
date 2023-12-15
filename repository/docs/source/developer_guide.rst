@@ -22,7 +22,7 @@ To set up a development environment:
 
     git clone <SSH>
     cd londontube
-    pip install -e .
+    pip install .
 
 
 Testing
