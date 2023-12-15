@@ -10,9 +10,16 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
+import os
+import sys
 # sys.path.insert(0, os.path.abspath('.'))
+
+# Relative path from the conf.py file to the londontube package
+relative_path_to_package = '../../londontube'
+
+# Convert to absolute path and add to sys.path
+absolute_path_to_package = os.path.abspath(os.path.join(os.path.dirname(__file__), relative_path_to_package))
+sys.path.insert(0, absolute_path_to_package)
 
 
 # -- Project information -----------------------------------------------------
@@ -28,6 +35,10 @@ author = 'Group 07'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.todo',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.doctest'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -49,4 +60,4 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
