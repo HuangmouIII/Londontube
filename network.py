@@ -100,5 +100,55 @@ class Network:
         """
         return self._adjacency_matrix
 
+    def __add__(self, other):
+        """
+        Combines the adjacency matrix of this network with another network's 
+        adjacency matrix. The combined network has an adjacency matrix formed by 
+        taking the element-wise minimum of the adjacency matrices of the sub-networks.
+        When taking the minimum, values of 0 is ignored due to not existing edge.
 
+        Args:
+            other (Network): Another Network object to combine with
+
+        Returns:
+            Network: A new Network instance with the combined other (Network).
+
+        Raises:
+            TypeError: If the other object is not an instance of Network.
+            ValueError: If the networks have a different number of nodes.
+        """
+
+        # Check if the other object is also an instance of Network
+        if not isinstance(other, Network):
+            raise TypeError("Both objects must be instances of Network")
+
+        # Ensure both networks have the same number of nodes
+        if self.n_nodes != other.n_nodes:
+            raise ValueError("Both networks must have the same number of nodes")
+
+        # Initialize an empty list to store the combined adjacency matrix
+        combined_matrix = []
+
+        # Iterate over rows of both adjacency matrices simultaneously
+        for row_self, row_other in zip(self.adjacency_matrix, other.adjacency_matrix):
+            combined_row = []  # Initialize a new row for the combined matrix
+
+            # Iterate over elements of both rows simultaneously
+            for val_self, val_other in zip(row_self, row_other):
+                # If one of the values is 0, use the other value (ignoring zeros)
+                if val_self == 0:
+                    combined_row.append(val_other)
+                elif val_other == 0:
+                    combined_row.append(val_self)
+                else:
+                    # If neither value is zero, take the minimum
+                    combined_row.append(min(val_self, val_other))
+
+            # Append the combined row to the combined matrix
+            combined_matrix.append(combined_row)
+
+        # Return a new Network object with the combined adjacency matrix
+        return Network(combined_matrix)
+
+    
 
