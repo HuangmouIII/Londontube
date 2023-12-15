@@ -203,4 +203,71 @@ class Network:
         return neighbours
 
    
+    def dijkstra(self, start, destination):
+        """
+        Implement Dijkstra's algorithm to find the shortest path and its cost from 
+        'start' to 'destination'.
+
+        Args:
+            start (int): The index of the start node.
+            destination (int): The index of the destination node.
+
+        Returns:
+            tuple: A tuple containing the shortest path as a list of node indices 
+            and the total cost as an integer.
+
+        Raises:
+            ValueError: If 'start' or 'destination' node index exceeds total number of nodes.
+        """
+        if start >= self.n_nodes or destination >= self.n_nodes:
+            raise ValueError("Start or destination node index out of bounds")
+
+        # Step 1 & 2: Initialize costs and visited nodes
+        costs = [float('inf')] * self.n_nodes
+        costs[start] = 0
+        visited = [False] * self.n_nodes
+        previous_nodes = [-1] * self.n_nodes
+
+        # Step 3: Set previous node for each node as the start node
+        previous_nodes[start] = start
+
+        # Step 4: Create a priority queue and add the start node
+        queue = [(0, start)]
+
+        while queue:
+            # Step 9: Select the unvisited node with the smallest tentative cost
+            current_cost, current_node = heapq.heappop(queue)
+            if visited[current_node]:
+                continue
+
+            # Step 6: Mark the current node as visited
+            visited[current_node] = True
+
+            # Step 7: Check if destination is reached
+            if current_node == destination:
+                break
+
+            # Step 5: Consider nearest-neighbours of the current node
+            for neighbor, edge_cost in enumerate(self.adjacency_matrix[current_node]):
+                if edge_cost > 0 and not visited[neighbor]:
+                    new_cost = current_cost + edge_cost
+                    if new_cost < costs[neighbor]:
+                        costs[neighbor] = new_cost
+                        previous_nodes[neighbor] = current_node
+                        heapq.heappush(queue, (new_cost, neighbor))
+
+        # Step 8: Check if path exists
+        if costs[destination] == float('inf'):
+            return None, float('inf')
+
+        # Reconstructing the path
+        path = []
+        node = destination
+        while node != start:
+            path.append(node)
+            node = previous_nodes[node]
+        path.append(start)
+        path.reverse()
+
+        return path, costs[destination]
 
