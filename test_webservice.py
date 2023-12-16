@@ -17,6 +17,18 @@ def test_wrong_date_formats():
     with pytest.raises(ValueError, match="Date must be of the format YYYY-MM-DD"):
         with patch('sys.argv', ['journey_planner.py', '0', '1', '01-01-2000']):
             main()
+    #UPDATE AND EDIT THIS NEXT
+
+#testing that appropriate error raised if user tries to fetch disruptions on a day that is too far in the future or past
+def test_wrong_date_formats():
+    #the case of the date being too far in the past
+    with pytest.raises(ValueError, match="Date must be between 2023-01-01 and 2024-12-31 inclusive"):
+        with patch('sys.argv', ['journey_planner.py', '0', '1', '2010-01-01']):
+            main()
+    #the case of the date being too far in the future
+    with pytest.raises(ValueError, match="Date must be between 2023-01-01 and 2024-12-31 inclusive"):
+        with patch('sys.argv', ['journey_planner.py', '0', '1', '2030-01-01']):
+            main()
 
 #testing that appropriate error thrown when information requested about station that doesn't exist
 def test_nonexistent_station():
@@ -36,9 +48,7 @@ def test_nonexistent_station():
     with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
         with patch('sys.argv', ['journey_planner.py', '1', '-5', '01-01-2000']):
             main()
-
-#testing that appropriate error raised if user tries to fetch disruptions on a day that is too far in the future or past
-#in the style of the above
+    #FIX THESE DATES TOO
 
 #negative tests of API functions:
 
@@ -62,7 +72,7 @@ def test_journey_planner_query_failure():
         with pytest.raises(Exception, match="Failed to get disruption information"):
             update_matrix_disruption([[0, 1], [1, 0]], date="01-01-2000")
 
-#testing that appropriate error thrown when information requested about line that doesn't exist
+#testing that functions in journey_planner raise appropriate error when information requested about line that doesn't exist
 def test_nonexistent_line():
     with pytest.raises(ValueError, match="Line ID must be between 0 and 11 inclusive"):
         query_line_connectivity(-1)
