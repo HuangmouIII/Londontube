@@ -9,15 +9,14 @@ from web_query import query_line_connectivity, station_information, update_matri
 
 #testing that appropriate errors raised when inputted date format is incorrect
 def test_wrong_date_formats():
-    #the case of the entire date being too long
-    with pytest.raises(ValueError, match="Date must be of the format YYYY-MM-DD"):
-        with patch('sys.argv', ['journey_planner.py', '0', '1', '20000-01-01']):
-            main()
     #the case of supplying MM-DD-YYYY instead
     with pytest.raises(ValueError, match="Date must be of the format YYYY-MM-DD"):
         with patch('sys.argv', ['journey_planner.py', '0', '1', '01-01-2000']):
             main()
-    #UPDATE AND EDIT THIS NEXT
+    #the case of supplying YY-MM-DD instead
+    with pytest.raises(ValueError, match="Date must be of the format YYYY-MM-DD"):
+        with patch('sys.argv', ['journey_planner.py', '0', '1', '23-01-01']):
+            main()
 
 #testing that appropriate error raised if user tries to fetch disruptions on a day that is too far in the future or past
 def test_wrong_date_formats():
