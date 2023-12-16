@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 from journey_planner import main
-#from ..londontube.journey_planner import main #import from the correct place in directory
+#from ..londontube.journey_planner import main
 from web_query import query_line_connectivity, station_information, update_matrix_disruption
 #from ..londontube.web_query import journey_planner
 
@@ -18,7 +18,13 @@ def test_wrong_date_formats():
         with patch('sys.argv', ['journey_planner.py', '0', '1', '01-01-2000']):
             main()
 
-#negative tests of the API:
+#testing that appropriate error thrown when information requested about station that doesn't exist
+#in the style of the above
+
+#testing that appropriate error raised if user tries to fetch disruptions on a day that is too far in the future or past
+#in the style of the above
+
+#negative tests of API functions:
 
 #testing that functions in journey_planner raise an appropriate exception when query unsuccessful (status_code!=200)
 def test_journey_planner_query_failure():
@@ -40,6 +46,13 @@ def test_journey_planner_query_failure():
         with pytest.raises(Exception, match="Failed to get disruption information"):
             update_matrix_disruption([[0, 1], [1, 0]], date="01-01-2000")
 
-#testing that appropriate error thrown when information requested about station/list that doesn't exist
-
-#testing that appropriate error raised if user tries to fetch disruptions on a day that is too far in the future or past
+#testing that appropriate error thrown when information requested about line that doesn't exist
+def test_nonexistent_line():
+    with pytest.raises(ValueError, match="Line ID must be between 0 and 11 inclusive"):
+        query_line_connectivity(-1)
+    with pytest.raises(ValueError, match="Line ID must be between 0 and 11 inclusive"):
+        query_line_connectivity(12)
+    with pytest.raises(ValueError, match="Line ID must be between 0 and 11 inclusive"):
+        station_information(-1)
+    with pytest.raises(ValueError, match="Line ID must be between 0 and 11 inclusive"):
+        station_information(12)
