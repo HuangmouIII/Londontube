@@ -19,7 +19,7 @@ def test_wrong_date_formats():
             main()
 
 #testing that appropriate error raised if user tries to fetch disruptions on a day that is too far in the future or past
-def test_wrong_date_formats():
+def test_wrong_date_range():
     #the case of the date being too far in the past
     with pytest.raises(ValueError, match="Date must be between 2023-01-01 and 2024-12-31 inclusive"):
         with patch('sys.argv', ['journey_planner.py', '0', '1', '2010-01-01']):
@@ -33,19 +33,19 @@ def test_wrong_date_formats():
 def test_nonexistent_station():
     #the case of start ID being too large
     with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
-        with patch('sys.argv', ['journey_planner.py', '300', '1', '2000-01-01']):
+        with patch('sys.argv', ['journey_planner.py', '300', '1', '2023-01-01']):
             main()
     #the case of destination ID being too large
     with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
-        with patch('sys.argv', ['journey_planner.py', '1', '300', '2000-01-01']):
+        with patch('sys.argv', ['journey_planner.py', '1', '300', '2023-01-01']):
             main()
     #the case of start ID being too small
     with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
-        with patch('sys.argv', ['journey_planner.py', '-5', '1', '2000-01-01']):
+        with patch('sys.argv', ['journey_planner.py', '-5', '1', '2023-01-01']):
             main()
     #the case of destination ID being too small
     with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
-        with patch('sys.argv', ['journey_planner.py', '1', '-5', '2000-01-01']):
+        with patch('sys.argv', ['journey_planner.py', '1', '-5', '2023-01-01']):
             main()
 
 #negative tests of API functions:
