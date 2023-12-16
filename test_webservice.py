@@ -19,7 +19,23 @@ def test_wrong_date_formats():
             main()
 
 #testing that appropriate error thrown when information requested about station that doesn't exist
-#in the style of the above
+def test_nonexistent_station():
+    #the case of start ID being too large
+    with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
+        with patch('sys.argv', ['journey_planner.py', '300', '1', '01-01-2000']):
+            main()
+    #the case of destination ID being too large
+    with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
+        with patch('sys.argv', ['journey_planner.py', '1', '300', '01-01-2000']):
+            main()
+    #the case of start ID being too small
+    with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
+        with patch('sys.argv', ['journey_planner.py', '-5', '1', '01-01-2000']):
+            main()
+    #the case of destination ID being too small
+    with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
+        with patch('sys.argv', ['journey_planner.py', '1', '-5', '01-01-2000']):
+            main()
 
 #testing that appropriate error raised if user tries to fetch disruptions on a day that is too far in the future or past
 #in the style of the above
