@@ -1,11 +1,40 @@
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 from journey_planner import main
 #from ..londontube.journey_planner import main
 from web_query import query_line_connectivity, station_information, update_matrix_disruption
 #from ..londontube.web_query import journey_planner
 
-#negative tests of the CLI:
+#1. positive tests of the functions in journey_planner and web_query:
+
+#testing that query_line_connectivity unpacks webservice data as expeected by mocking requests.get()
+def test_query_line_connectivity():
+    with patch('requests.get') as mock_get:
+        #setting up the mock webservice response
+        mock_response = Mock()
+        mock_response.text = "1,2,10\n2,3,15\n3,4,12\n"
+        mock_response.status_code = 200
+        mock_get.return_value = mock_response
+
+        # Call the function with a mock line identifier
+        network_data = query_line_connectivity("mock_line_id")
+
+        # Assert that requests.get was called with the correct URL
+        mock_get.assert_called_once_with("https://rse-with-python.arc.ucl.ac.uk/londontube-service/line/query?line_identifier=mock_line_id")
+
+        assert network_data == [
+            [1, 2, 10],
+            [2, 3, 15],
+            [3, 4, 12]
+        ]
+        
+#testing that station_information gives the expected output (mocking requests.get())
+
+#testing update_matrix_disruption gives the expected output (mocking requests.get())
+
+#testing get_station_name gives the expected output (mocking requests.get())
+
+#2. negative tests of the CLI:
 
 #testing that appropriate errors raised when inputted date format is incorrect
 def test_wrong_date_formats():
@@ -48,7 +77,7 @@ def test_nonexistent_station():
         with patch('sys.argv', ['journey_planner.py', '1', '-5', '2023-01-01']):
             main()
 
-#negative tests of API functions:
+#3. negative tests of API functions:
 
 #testing that functions in journey_planner raise an appropriate exception when query unsuccessful (status_code!=200)
 def test_journey_planner_query_failure():
