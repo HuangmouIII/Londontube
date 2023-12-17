@@ -1,6 +1,8 @@
 import pytest
+import importlib
 from unittest.mock import patch, Mock
-from journey_planner import main
+journey_planner = importlib.import_module("journey-planner")
+#from journey-planner import main
 #from ..londontube.journey_planner import main
 from web_query import query_line_connectivity, station_information, update_matrix_disruption
 #from ..londontube.web_query import journey_planner
@@ -39,7 +41,6 @@ def test_station_information():
         #assert that requests.get was called with the correct URL
         mock_get.assert_called_once_with("https://rse-with-python.arc.ucl.ac.uk/londontube-service/stations/query?id=mock_line_id")
 
-        #assert the result or any other assertions as needed
         assert stations_data == [
             ["1", "Station A", "51.123", "-0.456"],
             ["2", "Station B", "51.234", "-0.567"]
@@ -56,41 +57,41 @@ def test_wrong_date_formats():
     #the case of supplying MM-DD-YYYY instead
     with pytest.raises(ValueError, match="Date must be of the format YYYY-MM-DD"):
         with patch('sys.argv', ['journey_planner.py', '0', '1', '01-01-2000']):
-            main()
+            journey_planner.main()
     #the case of supplying YY-MM-DD instead
     with pytest.raises(ValueError, match="Date must be of the format YYYY-MM-DD"):
         with patch('sys.argv', ['journey_planner.py', '0', '1', '23-01-01']):
-            main()
+           journey_planner.main()
 
 #testing that appropriate error raised if user tries to fetch disruptions on a day that is too far in the future or past
 def test_wrong_date_range():
     #the case of the date being too far in the past
     with pytest.raises(ValueError, match="Date must be between 2023-01-01 and 2024-12-31 inclusive"):
         with patch('sys.argv', ['journey_planner.py', '0', '1', '2010-01-01']):
-            main()
+            journey_planner.main()
     #the case of the date being too far in the future
     with pytest.raises(ValueError, match="Date must be between 2023-01-01 and 2024-12-31 inclusive"):
         with patch('sys.argv', ['journey_planner.py', '0', '1', '2030-01-01']):
-            main()
+            journey_planner.main()
 
 #testing that appropriate error thrown when information requested about station that doesn't exist
 def test_nonexistent_station():
     #the case of start ID being too large
     with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
         with patch('sys.argv', ['journey_planner.py', '300', '1', '2023-01-01']):
-            main()
+            journey_planner.main()
     #the case of destination ID being too large
     with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
         with patch('sys.argv', ['journey_planner.py', '1', '300', '2023-01-01']):
-            main()
+            journey_planner.main()
     #the case of start ID being too small
     with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
         with patch('sys.argv', ['journey_planner.py', '-5', '1', '2023-01-01']):
-            main()
+            journey_planner.main()
     #the case of destination ID being too small
     with pytest.raises(ValueError, match="Station ID must be between 0 and 295 inclusive"):
         with patch('sys.argv', ['journey_planner.py', '1', '-5', '2023-01-01']):
-            main()
+            journey_planner.main()
 
 #3. negative tests of API functions:
 
