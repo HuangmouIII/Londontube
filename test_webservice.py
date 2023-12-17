@@ -7,7 +7,7 @@ from web_query import query_line_connectivity, station_information, update_matri
 
 #1. positive tests of the functions in journey_planner and web_query:
 
-#testing that query_line_connectivity unpacks webservice data as expeected by mocking requests.get()
+#testing that query_line_connectivity unpacks webservice data as expected by mocking requests.get()
 def test_query_line_connectivity():
     with patch('requests.get') as mock_get:
         #setting up the mock webservice response
@@ -16,10 +16,8 @@ def test_query_line_connectivity():
         mock_response.status_code = 200
         mock_get.return_value = mock_response
 
-        # Call the function with a mock line identifier
         network_data = query_line_connectivity("mock_line_id")
-
-        # Assert that requests.get was called with the correct URL
+        #assert that requests.get was called with the correct URL
         mock_get.assert_called_once_with("https://rse-with-python.arc.ucl.ac.uk/londontube-service/line/query?line_identifier=mock_line_id")
 
         assert network_data == [
@@ -28,7 +26,24 @@ def test_query_line_connectivity():
             [3, 4, 12]
         ]
         
-#testing that station_information gives the expected output (mocking requests.get())
+#testing that station_information unpacks webservice data as expected by mocking requests.get()
+def test_station_information():
+    with patch('requests.get') as mock_get:
+        #setting up the mock webservice response
+        mock_response = Mock()
+        mock_response.text = "station index,station name,latitude,longitude\n1,Station A,51.123,-0.456\n2,Station B,51.234,-0.567\n"
+        mock_response.status_code = 200
+        mock_get.return_value = mock_response
+
+        stations_data = station_information(line_id="mock_line_id")
+        #assert that requests.get was called with the correct URL
+        mock_get.assert_called_once_with("https://rse-with-python.arc.ucl.ac.uk/londontube-service/stations/query?id=mock_line_id")
+
+        #assert the result or any other assertions as needed
+        assert stations_data == [
+            ["1", "Station A", "51.123", "-0.456"],
+            ["2", "Station B", "51.234", "-0.567"]
+        ]
 
 #testing update_matrix_disruption gives the expected output (mocking requests.get())
 
