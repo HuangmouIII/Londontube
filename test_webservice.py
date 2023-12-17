@@ -47,6 +47,34 @@ def test_station_information():
         ]
 
 #testing update_matrix_disruption gives the expected output (mocking requests.get())
+def test_update_matrix_disruption():
+    with patch('requests.get') as mock_get:
+        #setting up the mock webservice response
+        mock_response = Mock()
+        mock_response.json.return_value = [
+            {
+                "line": 7,
+                "stations": [0, 1],
+                "delay": 2
+            },
+            {
+                "stations": [2],
+                "delay": 0
+            }
+        ]
+        mock_response.status_code = 200
+        mock_get.return_value = mock_response
+
+        mock_weight_matrix = [[1, 1, 1], 
+                              [1, 1, 1],
+                              [1, 1, 1]]
+        updated_matrix = update_matrix_disruption(weight_matrix=mock_weight_matrix, date="mock_date")
+        #assert that requests.get was called with the correct URL
+        mock_get.assert_called_once_with("https://rse-with-python.arc.ucl.ac.uk/londontube-service/disruptions/query?date=mock_date")
+
+        assert updated_matrix == [[1, 2, 0], 
+                                  [2, 1, 0]
+                                  [0, 0, 0]]
 
 #testing get_station_name gives the expected output (mocking requests.get())
 
