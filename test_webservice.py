@@ -1,12 +1,10 @@
 import pytest
 import importlib
 from unittest.mock import patch, Mock
-journey_planner = importlib.import_module("journey-planner")
-#from journey-planner import main
-#from ..londontube.journey_planner import main
-#journey_planner = importlib.import_module("..londontube.journey-planner")
-from web_query import query_line_connectivity, station_information, update_matrix_disruption
-#from ..londontube.web_query import query_line_connectivity, station_information, update_matrix_disruption
+#journey_planner = importlib.import_module("journey-planner")
+journey_planner = importlib.import_module("..londontube.journey-planner")
+#from web_query import query_line_connectivity, station_information, update_matrix_disruption
+from ..londontube.web_query import query_line_connectivity, station_information, update_matrix_disruption
 
 #1. positive tests of the functions in journey_planner and web_query:
 
