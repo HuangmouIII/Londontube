@@ -4,8 +4,9 @@ from unittest.mock import patch, Mock
 journey_planner = importlib.import_module("journey-planner")
 #from journey-planner import main
 #from ..londontube.journey_planner import main
+#journey_planner = importlib.import_module("..londontube.journey-planner")
 from web_query import query_line_connectivity, station_information, update_matrix_disruption
-#from ..londontube.web_query import journey_planner
+#from ..londontube.web_query import query_line_connectivity, station_information, update_matrix_disruption
 
 #1. positive tests of the functions in journey_planner and web_query:
 
@@ -46,7 +47,7 @@ def test_station_information():
             ["2", "Station B", "51.234", "-0.567"]
         ]
 
-#testing update_matrix_disruption gives the expected output (mocking requests.get())
+#testing update_matrix_disruption unpacks webservice data as expected by mocking requests.get()
 def test_update_matrix_disruption():
     with patch('requests.get') as mock_get:
         #setting up the mock webservice response
@@ -76,7 +77,13 @@ def test_update_matrix_disruption():
                                   [2, 1, 0]
                                   [0, 0, 0]]
 
-#testing get_station_name gives the expected output (mocking requests.get())
+#testing get_station_name gives the expected output by mocking station_information
+def test_get_station_name():
+    with patch('web_query.station_information') as mock_station_information:
+        mock_station_information.return_value = [["1", "Station A", "51.123", "-0.456"], ["2", "Station B", "51.234", "-0.567"]]
+
+        name = journey_planner.get_station_name(1)
+        assert name == "Station A"
 
 #2. negative tests of the CLI:
 
