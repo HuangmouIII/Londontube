@@ -13,6 +13,12 @@ setup(
     install_requires=[
         # List your package dependencies here
         'requests',
+        'matplotlib',
+        'pytest',
+        'numpy',
+        'timeit',
+        'pandas',
+        'urllib'
         # etc.
     ],
     classifiers=[
