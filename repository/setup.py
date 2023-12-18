@@ -15,10 +15,7 @@ setup(
         'requests',
         'matplotlib',
         'pytest',
-        'numpy',
-        'timeit',
-        'pandas',
-        'urllib'
+        'numpy'
         # etc.
     ],
     classifiers=[
