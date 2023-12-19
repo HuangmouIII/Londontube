@@ -26,7 +26,19 @@ It includes functions to plot journey paths, clean data, and convert station ind
 
 #Function to transfer the index to name
 def get_station_name(station_index):
+    """
+    Get the name of a station based on its index.
 
+    Args:
+        station_index (int): The index of the station.
+
+    Returns:
+        str or None: The name of the station if found, or None if the index is invalid.
+    
+    Example:
+        >>> get_station_name(10)
+        'King's Cross St Pancras'
+    """
     stations_data = station_information('all')
     station_names = [station[1] for station in stations_data] # Extract the names from station data
 
