@@ -16,8 +16,7 @@ Basic Usage
   # Station information
   from londontube.web_query import update_matrix_disruption
   # Update matrix information for disruption
-
-
+  from londontube.web_query import journey_planner
 
 Network Class User Guide
 ------------------------
