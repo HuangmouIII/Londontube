@@ -29,7 +29,18 @@ def query_line_connectivity(line_id):
     return network_data
 
 def station_information(line_id):
+    """
+    Retrieve information about London Tube stations for a specific line or all lines.
 
+    Args:
+        line_id (str): The identifier for the line to query. Use 'all' to retrieve information for all stations.
+
+    Returns:
+        list: A list of lists containing station information. Each inner list includes station attributes in the following order:
+            1. Station ID
+            2. Station Name
+            3. Station Coordinate
+    """
     response = requests.get(f"https://rse-with-python.arc.ucl.ac.uk/londontube-service/stations/query?id={line_id}")
     lines = response.text.strip().split('\n')
     
