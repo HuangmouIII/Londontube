@@ -176,10 +176,17 @@ def journey_planner(start, destination, setoff_date=None): #default date is none
     stations_data = station_information('all') #get all stations information
     station_names = [station[1] for station in stations_data] #extract names from the station information
 
-    #Convert names to indices
-    start_index = station_names.index(start) if start in station_names else int(start)
-    destination_index = station_names.index(destination) if destination in station_names else int(destination)
+    try:
+        # Try to convert 'start' and 'destination' to integers if they are not in 'station_names'
+        start_index = int(start) if start not in station_names else station_names.index(start)
+        destination_index = int(destination) if destination not in station_names else station_names.index(destination)
+    except ValueError:
+        raise ValueError("Invalid station ID")
 
+    # Validate whether station indexes are within a valid range
+    if not (0 <= start_index < len(stations_data)) or not (0 <= destination_index < len(stations_data)):
+        raise ValueError("Station ID must be between 0 and 295 inclusive")
+    
     #Determine the number of stations
     n_max = len(stations_data)
     weight_matrix = np.zeros((n_max, n_max)) # Initialize the weight matrix with zeros
