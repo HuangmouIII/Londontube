@@ -186,3 +186,73 @@ def journey_planner(start, destination, setoff_date=None): #default date is none
             "path": original_path,
             "station_names": station_names
         }
+def query_line_connectivity1(line_id):
+    """
+    Queries the connectivity data of a specific tube line based on its identifier.
+
+    This function sends a GET request to a web service to retrieve the network data
+    for a specified tube line in London. The data is processed and returned as a list
+    of lists, where each inner list contains integer values representing connectivity
+    information.
+
+    Args:
+    line_id (str): A unique identifier for the tube line whose data is to be queried.
+
+    Returns:
+    list of lists: Network data representing connectivity of the tube line. Each sublist
+    contains integers representing specific connectivity information.
+
+    Raises:
+    ValueError: If the tube line with the specified identifier does not exist (HTTP 404 error).
+    Exception: For any other HTTP errors encountered during the request.
+
+    Note:
+    The function relies on a specific external service URL and expects a specific response format.
+    """
+# Send a GET request to the service
+    response = requests.get(
+        f"https://rse-with-python.arc.ucl.ac.uk/londontube-service/line/query?line_identifier={line_id}")
+# Check the HTTP response status code
+    if response.status_code == 404: # 404 Not Found
+        raise ValueError(f"Line with identifier '{line_id}' does not exist.")
+    elif response.status_code != 200:
+        raise Exception(f"Failed to retrieve data for line {line_id}. Status code: {response.status_code}")
+# Process the response text
+    lines = response.text.strip().split('\n')
+    network_data = [list(map(int, line.split(','))) for line in lines]
+    return network_data
+
+def station_information1(line_id):
+    """
+    Retrieves information about the stations on a specific tube line based on its identifier.
+
+    This function sends a GET request to a web service to fetch information about the
+    stations on a given tube line. The response is parsed into a list of lists, where
+    each inner list represents data for a single station.
+
+    Args:
+    line_id (str): A unique identifier for the tube line whose station data is to be queried.
+
+    Returns:
+    list of lists: Data about the stations on the specified tube line. Each sublist contains
+    station information, typically as strings.
+
+    Raises:
+    ValueError: If no station with the specified identifier exists (HTTP 404 error).
+    Exception: For any other HTTP errors encountered during the request.
+
+    Note:
+    The function encodes the `line_id` parameter to handle special characters in URLs. It also
+    assumes a specific response format from the external service.
+    """
+    encoded_line_id = quote(line_id)
+    response = requests.get(f"https://rse-with-python.arc.ucl.ac.uk/londontube-service/stations/query?id={encoded_line_id}")
+
+# Check the HTTP response status code
+    if response.status_code == 404: # Not Found
+        raise ValueError(f"Station with identifier '{line_id}' does not exist.")
+    elif response.status_code != 200:
+        raise Exception(f"Failed to retrieve data for station {line_id}. Status code: {response.status_code}")
+
+    stations_data = [line.split(',') for line in response.text.strip().split('\n')[1:]]
+    return stations_data
