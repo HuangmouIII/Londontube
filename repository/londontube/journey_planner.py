@@ -166,10 +166,15 @@ def main():
     # Parse arguments from the command line
     args = parser.parse_args()
 
-    # Convert indices to station names if indices are existed
-    start_station = get_station_name(args.start) or args.start
-    destination_station = get_station_name(args.destination) or args.destination
+    # Convert station indexes to station names
+    start_station = get_station_name(args.start) if args.start.isdigit() else args.start
+    destination_station = get_station_name(args.destination) if args.destination.isdigit() else args.destination
 
+    # If the index is out of range, raise an error
+    if start_station is None or destination_station is None:
+        raise ValueError("Station ID must be between 0 and 295 inclusive")
+
+    # Call the journey_planner function
     result = journey_planner(start_station, destination_station, args.setoff_date)
     
     # Check if the journey is possible
