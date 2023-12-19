@@ -77,7 +77,18 @@ def clean_data(data):
 
 #Function to plot    
 def plot_journey(path, station_names):
+    """
+    Plot a journey path on a map. First plot all the stations in the map and the connect the path
+    with a blue line.
 
+    Args:
+        path (list): A list of station indices representing the journey path.
+        station_names (list): A list of station names corresponding to station indices.
+
+    Returns:
+        None
+
+    """
     # Extract coordinates for all stations
     all_station_coordinates = []
     stations_data = station_information("all")
