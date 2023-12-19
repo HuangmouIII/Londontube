@@ -27,3 +27,23 @@ def query_line_connectivity(line_id):
     lines = response.text.strip().split('\n')
     network_data = [list(map(int, line.split(','))) for line in lines]
     return network_data
+
+def station_information(line_id):
+
+    response = requests.get(f"https://rse-with-python.arc.ucl.ac.uk/londontube-service/stations/query?id={line_id}")
+    lines = response.text.strip().split('\n')
+    
+    stations_data = []
+    for line in lines[1:]:  # Skip the first line 
+        parts = line.split(',')
+        
+        #Design for Heathrow Terminals 1
+        if len(parts) > 4:
+            del parts[2]
+        
+        # Clean up station names by removing unwanted symbols and trimming spaces
+        station_name = parts[1].replace('&', 'and').replace('"', '').strip()
+        # Add other necessary parts if there are more details to be included
+        stations_data.append([parts[0], station_name] + parts[2:])
+        
+    return stations_data
