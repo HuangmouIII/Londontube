@@ -1,3 +1,4 @@
+![distant_neighbours_plot.png](distant_neighbours_plot.png)
 
 ## Times for Station 10
 |   N Value |   New Method Time (s) |   Provided Method Time (s) |

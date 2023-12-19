@@ -4,12 +4,41 @@ import pandas as pd
 import timeit
 from londontube.web_query import query_line_connectivity1, station_information1
 from londontube.network import Network
+"""
+Compare two method running speed for two function Distant Neighbours funtion - User Guide
+
+Prerequisites:
+
+Python libraries: NumPy, Matplotlib, Pandas ,timeit
+Install Libraries (if needed): londontube package
+
+Copy code
+pip install numpy matplotlib pandas
+Script Overview:
+
+Fetches station data and connectivity data for the London Tube network.
+Populates a weight matrix with the fetched data.
+Analyzes performance of two methods:
+weight_matrix_network.distant_neighbours()
+provided_distant_neighbours()
+
+Usage:
+Modify station_list to include desired stations.
+Calculate speed for two method and plot which one is faster.
+
+Output:
+Execution times written to distant_neighbours_times.md.
+Performance plot displayed with logarithmic scales.
+Note:
+
+Ensure the londontube package is properly installed.
+Contact support for any issues or questions.
+
+"""
 def provided_distant_neighbours(n, v, adjacency_matrix):
     neighbours = [v]
     for i in range(n):
         new_neighbours = []
-
-
         for index in neighbours:
             row = adjacency_matrix[index]
             for j in range(len(row)):
@@ -38,7 +67,7 @@ for i in range(len(allweight_inf)):
 
 weight_matrix_network = Network(weight_matrix)
 # Preparing test stations
-station_list = ['Baker Street']
+station_list = ['Baker Street', 'Blackfriars', 'Cockfosters', "Earl's Court", 'Elephant & Castle', 'Finsbury Park', "King's Cross St. Pancras", 'Morden', 'Vauxhall']
 test_stations = [int(station_information1(i)[0][0]) for i in station_list]
 
 # Defining the range of n values for testing
