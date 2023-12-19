@@ -1,5 +1,6 @@
 import requests
 import numpy as np
+import re
 from londontube.network import Network
 from datetime import datetime
 from urllib.parse import quote
