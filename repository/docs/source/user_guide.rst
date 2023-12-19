@@ -250,7 +250,7 @@ When running the `journey_planner.py` script, you can specify the start, destina
 .. code-block:: bash
 
     # To plan a journey from 'Aldgate' to 'Angel' with plotting enabled
-    python journey_planner.py Aldgate Angel --plot
+    python journey_planner.py --plot "Aldgate" "Angel" 2023-12-1
 
 Please note that you should replace '&' with 'and' when specifying station names, and if you're starting or ending at 'Heathrow Terminals 1, 2 & 3', only type "Heathrow Terminals 1
 
