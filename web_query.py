@@ -115,3 +115,56 @@ def update_matrix_disruption(weight_matrix, date=None):
                     weight_matrix[station2][station1] = np.inf
 
     return weight_matrix
+
+def journey_planner(start, destination, setoff_date=None): #default date is none
+
+    stations_data = station_information('all') #get all stations information
+    station_names = [station[1] for station in stations_data] #extract names from the station information
+
+    #Convert names to indices
+    start_index = station_names.index(start) if start in station_names else int(start)
+    destination_index = station_names.index(destination) if destination in station_names else int(destination)
+
+    #Determine the number of stations
+    n_max = len(stations_data)
+    weight_matrix = np.zeros((n_max, n_max)) # Initialize the weight matrix with zeros
+    allweight_inf = []
+    
+    # Collect connectivity information for each line
+    for i in range(12):
+        allweight_inf += query_line_connectivity(i)
+        
+    # Populate the weight matrix with connectivity information
+    for a, b, weight in allweight_inf:
+        weight_matrix[a][b] = weight
+        weight_matrix[b][a] = weight
+        
+    # Use the current date if no setoff date is provided
+    setoff_date = setoff_date or datetime.now().strftime('%Y-%m-%d')
+    
+    # Update the matrix with disruption information
+    updated_matrix = update_matrix_disruption(weight_matrix, setoff_date)
+
+    # Initialize network instances for original and updated matrices
+    original_network = Network(weight_matrix)
+    updated_network = Network(updated_matrix)
+    
+    # Compute the shortest path using Dijkstra's algorithm
+    original_path, original_cost = original_network.dijkstra(start_index, destination_index)
+    updated_path, updated_cost = updated_network.dijkstra(start_index, destination_index)
+    
+    # Handle the case where a path is not available due to disruptions
+    if original_path is None:
+        if updated_path is None:
+            return{"message":"Journey is not possible due to disruptions."}
+        else:
+            return {
+                "message": f"Journey will take {updated_cost} minutes.\nStart: {start}\n{' -> '.join(station_names[i] for i in updated_path)}\nEnd: {destination}",
+                "path": updated_path,
+                "station_names": station_names}
+    else:
+        return {
+            "message": f"Journey will take {original_cost} minutes.\nStart: {start}\n{' -> '.join(station_names[i] for i in original_path)}\nEnd: {destination}",
+            "path": original_path,
+            "station_names": station_names
+        }
