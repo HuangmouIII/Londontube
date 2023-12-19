@@ -257,15 +257,15 @@ def query_line_connectivity1(line_id):
     Note:
     The function relies on a specific external service URL and expects a specific response format.
     """
-# Send a GET request to the service
+    # Send a GET request to the service
     response = requests.get(
         f"https://rse-with-python.arc.ucl.ac.uk/londontube-service/line/query?line_identifier={line_id}")
-# Check the HTTP response status code
+    # Check the HTTP response status code
     if response.status_code == 404: # 404 Not Found
         raise ValueError(f"Line with identifier '{line_id}' does not exist.")
     elif response.status_code != 200:
         raise Exception(f"Failed to retrieve data for line {line_id}. Status code: {response.status_code}")
-# Process the response text
+    # Process the response text
     lines = response.text.strip().split('\n')
     network_data = [list(map(int, line.split(','))) for line in lines]
     return network_data
