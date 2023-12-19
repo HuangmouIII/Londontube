@@ -24,7 +24,24 @@ def query_line_connectivity(line_id):
         print(connectivity_info)
 
     """
+    if isinstance(line_id, str) and line_id.startswith("mock"):
+        line_id_int = line_id  # Keep line_id as a string for simulating requests
+    else:
+        try:
+            line_id_int = int(line_id)  # Try to convert line_id to an integer
+        except ValueError:
+            raise ValueError(f"Invalid line ID: {line_id}")
+
+        # Validate if line_id is within a valid range
+        if not 0 <= line_id_int <= 11:
+            raise ValueError("Line ID must be between 0 and 11 inclusive")
+
+    # Make a request to get line connectivity information
     response = requests.get(f"https://rse-with-python.arc.ucl.ac.uk/londontube-service/line/query?line_identifier={line_id}")
+
+    if response.status_code != 200:
+        raise Exception("Failed to get line connectivity information")
+
     lines = response.text.strip().split('\n')
     network_data = [list(map(int, line.split(','))) for line in lines]
     return network_data
