@@ -186,6 +186,7 @@ def journey_planner(start, destination, setoff_date=None): #default date is none
             "path": original_path,
             "station_names": station_names
         }
+        
 def query_line_connectivity1(line_id):
     """
     Queries the connectivity data of a specific tube line based on its identifier.
