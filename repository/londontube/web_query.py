@@ -149,6 +149,30 @@ def journey_planner(start, destination, setoff_date=None): #default date is none
         {'message': 'Journey will take 10 minutes.', 'path': [1, 2], 'station_names': ['Aldgate', 'Angel']}
     
     """
+    # Regular expression pattern to match the date format 'YYYY-MM-DD'
+    date_format_regex = r'^\d{4}-\d{2}-\d{2}$'
+
+    # Check if 'setoff_date' is provided and if it matches the expected format
+    if setoff_date and not re.match(date_format_regex, setoff_date):
+        raise ValueError("Date must be of the format YYYY-MM-DD")
+
+    # If 'setoff_date' is not provided, set it to the current date in 'YYYY-MM-DD' format
+    setoff_date = setoff_date or datetime.now().strftime('%Y-%m-%d')
+
+    # Define valid start and end dates as datetime objects
+    valid_start_date = datetime.strptime("2023-01-01", "%Y-%m-%d")
+    valid_end_date = datetime.strptime("2024-12-31", "%Y-%m-%d")
+
+    try:
+        # Try to convert 'setoff_date' to a datetime object
+        actual_date = datetime.strptime(setoff_date, "%Y-%m-%d")
+    except ValueError:
+        raise ValueError("Date must be of the format YYYY-MM-DD")
+
+    # Check if 'actual_date' is within the valid date range (inclusive)
+    if not (valid_start_date <= actual_date <= valid_end_date):
+        raise ValueError("Date must be between 2023-01-01 and 2024-12-31 inclusive")
+
     stations_data = station_information('all') #get all stations information
     station_names = [station[1] for station in stations_data] #extract names from the station information
 
