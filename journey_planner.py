@@ -47,3 +47,30 @@ def get_station_name(station_index):
         return station_names[int(station_index)]
     except (ValueError, IndexError): # If index is invalid or not found, return None
         return None
+    
+    #This is the function design for['116', 'Heathrow Terminals 1', ' 2  3', '51.4713', '-0.4524']    
+def clean_data(data):
+    """
+    Clean and preprocess station data.
+
+    Args:
+        data (list): A list of station data records.
+
+    Returns:
+        list: Cleaned and preprocessed station data.
+
+    Example:
+        >>> clean_data([[116, 'Heathrow Terminals 1', '2 3', '51.4713', '-0.4524']])
+        [[116, 'Heathrow Terminals 1', '51.4713', '-0.4524']]
+    """
+    cleaned_data = []
+    for record in data:
+        # If the recorded elements > 4, delete the third one (2&3)
+        if len(record) > 4:
+            del record[2]
+        
+        # Clean the rubbish
+        record = [re.sub(r'[&"]', '', str(item)) for item in record]
+        cleaned_data.append(record)
+
+    return cleaned_data
