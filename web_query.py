@@ -48,7 +48,7 @@ def station_information(line_id):
     for line in lines[1:]:  # Skip the first line 
         parts = line.split(',')
         
-        #Design for Heathrow Terminals 1
+    #Design for Heathrow Terminals 1
         if len(parts) > 4:
             del parts[2]
         
