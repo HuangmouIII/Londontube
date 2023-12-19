@@ -74,3 +74,45 @@ def clean_data(data):
         cleaned_data.append(record)
 
     return cleaned_data
+
+#Function to plot    
+def plot_journey(path, station_names):
+
+    # Extract coordinates for all stations
+    all_station_coordinates = []
+    stations_data = station_information("all")
+    cleaned_data = clean_data(stations_data)
+    
+   
+        
+    for station in cleaned_data:
+        try:
+            lat = float(station[2])
+            lon = float(station[3])
+            all_station_coordinates.append((lat, lon))
+        except ValueError as e:
+                print(f"Error converting station: {station}")
+
+    plt.figure(figsize=(12, 8))
+
+    # Plot all stations as black points
+    all_lats, all_lons = zip(*all_station_coordinates)
+    plt.scatter(list(map(float, all_lons)), list(map(float, all_lats)), color='black', marker='o')
+
+    # Plot the journey path as a continuous line
+    journey_coordinates = [(float(station_information(station)[0][3]), float(station_information(station)[0][2])) for station in path]
+    journey_lons, journey_lats = zip(*journey_coordinates)
+    
+    # Plot the route
+    plt.plot(list(map(float, journey_lons)), list(map(float, journey_lats)), color='blue', linestyle='-', linewidth=1.8)
+
+    plt.title(f'Journey from {station_names[path[0]]} to {station_names[path[-1]]}')
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
+    
+    # Save the plot as a file
+    plt.savefig(f"journey_from_{station_names[path[0]].replace(' ', '_')}_{station_names[path[-1]].replace(' ', '_')}.png")
+    
+    plt.show()
+
+
