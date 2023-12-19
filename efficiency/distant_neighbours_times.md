@@ -284,7 +284,7 @@ For how make it more efficient
 
 
 So for this result, we find that the time taken for provided method increases with n increasing. But for our method in network class, when n goes to 120, the time taken almost keep a straight line. 
-It means that our method use the information we obtain before when n goes to large, so it saves much computation on it and less time than provided one.
+It means that our method use the information we obtain before when n goes to large, so it saves much computation on it and less time than provided one.Another search direction is to increase the staion we have and find out whether the graph is still looks like this. See whether time take in our method would be larger.
 
 We also do some other investigation on other data . This one has 100*100 dimension and we also find that our method is faster. 
 
