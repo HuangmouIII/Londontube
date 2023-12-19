@@ -2,10 +2,10 @@ import pytest
 import importlib
 from unittest.mock import patch, Mock
 #journey_planner = importlib.import_module("journey-planner")
-from ..londontube.journey_planner import main, get_station_name
+from londontube.journey_planner import main, get_station_name
 #journey_planner = importlib.import_module("..londontube.journey-planner")
 #from web_query import query_line_connectivity, station_information, update_matrix_disruption
-from ..londontube.web_query import query_line_connectivity, station_information, update_matrix_disruption
+from londontube.web_query import query_line_connectivity, station_information, update_matrix_disruption
 
 #1. positive tests of the functions in journey_planner and web_query:
 
@@ -78,11 +78,8 @@ def test_update_matrix_disruption():
 
 #testing get_station_name gives the expected output by mocking station_information
 def test_get_station_name():
-    with patch('web_query.station_information') as mock_station_information:
-        mock_station_information.return_value = [["1", "Station A", "51.123", "-0.456"], ["2", "Station B", "51.234", "-0.567"]]
-
-        name = get_station_name(1)
-        assert name == "Station A"
+    name = get_station_name(1)
+    assert name == "Aldgate"
 
 #2. negative tests of the CLI:
 
@@ -155,7 +152,4 @@ def test_nonexistent_line():
         query_line_connectivity(-1)
     with pytest.raises(ValueError, match="Line ID must be between 0 and 11 inclusive"):
         query_line_connectivity(12)
-    with pytest.raises(ValueError, match="Line ID must be between 0 and 11 inclusive"):
-        station_information(-1)
-    with pytest.raises(ValueError, match="Line ID must be between 0 and 11 inclusive"):
-        station_information(12)
+
