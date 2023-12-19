@@ -127,3 +127,34 @@ def plot_journey(path, station_names):
     plt.show()
 
 
+# Main function
+def main():
+
+    parser = argparse.ArgumentParser(description="Journey Planner Tool") # Define arguments for the parser
+    parser.add_argument("start", help="Start station or index")
+    parser.add_argument("destination", help="Destination station or index")
+    parser.add_argument("setoff_date", nargs="?", default=None, help="Setoff date")
+    parser.add_argument("--plot", action="store_true", help="Enable plotting")
+    
+    # Parse arguments from the command line
+    args = parser.parse_args()
+
+    # Convert indices to station names if indices are existed
+    start_station = get_station_name(args.start) or args.start
+    destination_station = get_station_name(args.destination) or args.destination
+
+    result = journey_planner(start_station, destination_station, args.setoff_date)
+    
+    # Check if the journey is possible
+    if "Journey is not possible due to disruptions." in result["message"]:
+        print(result["message"])
+    
+    else:
+        print(result["message"])
+    
+
+        if args.plot:
+           plot_journey(result["path"], result["station_names"])
+           
+if __name__ == "__main__":
+    main()
