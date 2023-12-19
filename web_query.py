@@ -156,12 +156,15 @@ def journey_planner(start, destination, setoff_date=None): #default date is none
     # Handle the case where a path is not available due to disruptions
     if original_path is None:
         if updated_path is None:
+            #if both path are not exist that means this journey is not possible
             return{"message":"Journey is not possible due to disruptions."}
         else:
+            #update the path for the new line 
             return {
                 "message": f"Journey will take {updated_cost} minutes.\nStart: {start}\n{' -> '.join(station_names[i] for i in updated_path)}\nEnd: {destination}",
                 "path": updated_path,
                 "station_names": station_names}
+    #normal situation
     else:
         return {
             "message": f"Journey will take {original_cost} minutes.\nStart: {start}\n{' -> '.join(station_names[i] for i in original_path)}\nEnd: {destination}",
