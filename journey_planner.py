@@ -129,7 +129,34 @@ def plot_journey(path, station_names):
 
 # Main function
 def main():
+    """
+    Main function that serves as the entry point for the journey planner tool.
 
+    .. note:: Replace "&" with "and" if the name of station contains it, 
+              no symbols like [" ' ? .] will be acceptable.
+
+              'Heathrow Terminals 1' stands for 'Heathrow Terminals 1, 2 & 3'. 
+              When starting or ending at these terminals, only type "Heathrow Terminals 1".
+
+    :return: None
+    
+    Input requirements
+
+    Compulory input:
+    1.For start station, the index of the station or the name of station can be as the input.
+    2.For destination station, the index of the station or the name of station can be as the input.
+    
+    Optional input:
+    3.If you do not write the departure date, it will be the same day by default, and if you need to add the date, you need to follow the following format: YYYY-MM-DD
+    4.--plot is the plot function
+    
+    Genenral input format:[--plot] ["start station name/index"] ["destination station name/index"] [setoff date]
+    
+    Notice when using:
+    Important notice 1: Replace "&" with "and" if the name of station contains, no symbol like [" ' ? .] will be accepetable
+    Important notice 2: The  'Heathrow Terminals 1' is stand for  'Heathrow Terminals 1  2 & 3' When start/destination is Heathrow Terminals 1  2 & 3, only need to type "Heathrow Terminals 1"
+    
+    """
     parser = argparse.ArgumentParser(description="Journey Planner Tool") # Define arguments for the parser
     parser.add_argument("start", help="Start station or index")
     parser.add_argument("destination", help="Destination station or index")
