@@ -117,7 +117,22 @@ def update_matrix_disruption(weight_matrix, date=None):
     return weight_matrix
 
 def journey_planner(start, destination, setoff_date=None): #default date is none
+    """
+    Plan a journey from a starting station to a destination station, considering disruptions.
 
+    Args:
+        start (str or int): The starting station name or index.
+        destination (str or int): The destination station name or index.
+        setoff_date (str, optional): The date of the journey. Defaults to None.
+
+    Returns:
+        dict: A dictionary containing journey information including duration, path, and station names.
+    
+    Example:
+        >>> journey_planner('Aldgate', 'Angel')
+        {'message': 'Journey will take 10 minutes.', 'path': [1, 2], 'station_names': ['Aldgate', 'Angel']}
+    
+    """
     stations_data = station_information('all') #get all stations information
     station_names = [station[1] for station in stations_data] #extract names from the station information
 
