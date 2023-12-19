@@ -60,6 +60,10 @@ def station_information(line_id):
             3. Station Coordinate
     """
     response = requests.get(f"https://rse-with-python.arc.ucl.ac.uk/londontube-service/stations/query?id={line_id}")
+    
+    if response.status_code != 200:
+        raise Exception("Failed to get station information")
+    
     lines = response.text.strip().split('\n')
     
     stations_data = []
