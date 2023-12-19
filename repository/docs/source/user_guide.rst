@@ -102,15 +102,76 @@ Using Dijkstra's Algorithm
 journey_planner User Guide
 ---------------------------
 
+The journey_planner module is designed to help users plan their journeys across the London Tube network. It includes functions to find station names based on index, clean up station data, plot journey paths, and plan journeys considering possible disruptions.
+
+Finding Station Names
+^^^^^^^^^^^^^^^^^^^^^^
+
+To find the name of a station by its index, use the `get_station_name` function:
+
+.. code-block:: python
+
+    from londontube.journey_planner import get_station_name
+    station_name = get_station_name(10)
+    print(station_name)
+
+This will output the name of the station associated with the index `10`.
+
+Cleaning Station Data
+^^^^^^^^^^^^^^^^^^^^^^
+
+To clean and preprocess station data, use the `clean_data` function:
+
+.. code-block:: python
+
+    from londontube.journey_planner import clean_data
+    cleaned_data = clean_data([[116, 'Heathrow Terminals 1', '2 3', '51.4713', '-0.4524']])
+    print(cleaned_data)
+
+This function will process the input data and output a cleaned version.
+
+Plotting a Journey Path
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can plot a journey path using the `plot_journey` function. This function takes a path represented by a list of station indices and plots it:
+
+.. code-block:: python
+
+    from londontube.journey_planner import plot_journey
+    plot_journey([125, 251], ['Holborn', 'Tooting Broadway'])
+
+Planning a Journey
+^^^^^^^^^^^^^^^^^^^^
+
+To plan a journey, you can call the `journey_planner` function with the start and destination stations:
+
+.. code-block:: python
+
+    from londontube.journey_planner import journey_planner
+    journey_info = journey_planner('Holborn', 'Tooting Broadway')
+    print(journey_info)
+
+If the journey is possible, it will print the journey details, including the duration and path.
+
+Command Line Interface
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The journey planner can also be used via the command line. For example:
+
+.. code-block:: bash
+
+    journey-planner --plot "Northwood Hills" Upminster 2023-01-01
+
+This command will plan a journey from Holborn to Tooting Broadway and plot the path if the `--plot` option is included.
+
+Remember to replace special characters like `&` with `and` when inputting station names. For Heathrow Terminals, simply use "Heathrow Terminals 1" for the combined terminals
+
 
 
 web_query User Guide
 ---------------------
 
 
-
-distant_neighbours_efficiency User Guide
------------------------------------------
 
 
 distant_neighbours_efficiency Usage and Reproducibility
