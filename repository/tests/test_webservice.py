@@ -73,7 +73,7 @@ def test_update_matrix_disruption():
         mock_get.assert_called_once_with("https://rse-with-python.arc.ucl.ac.uk/londontube-service/disruptions/query?date=mock_date")
 
         assert updated_matrix == [[1, 2, 0], 
-                                  [2, 1, 0]
+                                  [2, 1, 0],
                                   [0, 0, 0]]
 
 #testing get_station_name gives the expected output by mocking station_information
