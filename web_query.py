@@ -60,7 +60,25 @@ def station_information(line_id):
     return stations_data
 
 def update_matrix_disruption(weight_matrix, date=None):
+    """
+    Update the weight matrix based on disruption information for a given date.
 
+    Args:
+        weight_matrix (numpy.ndarray): The original weight matrix representing station connectivity.
+        date (str): The date for which disruption information is to be considered.
+
+    Returns:
+        numpy.ndarray: The updated weight matrix with disruption effects applied.
+    
+    Example:
+    .. code-block:: python
+
+        # Example usage of update_matrix_disruption
+        weight_matrix = np.array([[0, 1], [1, 0]])  # Example weight matrix
+        date = '2023-01-01'  # Example date
+        updated_matrix = update_matrix_disruption(weight_matrix, date)
+        print(updated_matrix)
+    """
     #Check if there is no date, return the original weight matrix
     if date is None:
         return weight_matrix
