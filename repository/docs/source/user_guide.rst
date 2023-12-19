@@ -167,12 +167,93 @@ This command will plan a journey from Holborn to Tooting Broadway and plot the p
 Remember to replace special characters like `&` with `and` when inputting station names. For Heathrow Terminals, simply use "Heathrow Terminals 1" for the combined terminals
 
 
-
 web_query User Guide
 ---------------------
 
+Query Line Connectivity
+^^^^^^^^^^^^^^^^^^^^^^^^
 
+To retrieve line connectivity information, use the `query_line_connectivity` function:
 
+.. code-block:: python
+
+    from londontube.web_query import query_line_connectivity
+
+    # Example usage of query_line_connectivity
+    line_id = 1  # Example line ID for query
+    connectivity_info = query_line_connectivity(line_id)
+    print(connectivity_info)
+
+Station Information
+^^^^^^^^^^^^^^^^^^^^
+
+You can obtain detailed information about the stations using the `station_information` function:
+
+.. code-block:: python
+
+    from londontube.web_query import station_information
+
+    # Example usage to get information for all stations
+    stations_info = station_information('all')
+    print(stations_info)
+
+Update Matrix Disruption
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The `update_matrix_disruption` function allows you to update the weight matrix based on current disruptions:
+
+.. code-block:: python
+
+    import numpy as np
+    from londontube.web_query import update_matrix_disruption
+
+    # Example weight matrix for demonstration
+    weight_matrix = np.array([[0, 1], [1, 0]])
+    date = '2023-01-01'  # Example date for disruption query
+    updated_matrix = update_matrix_disruption(weight_matrix, date)
+    print(updated_matrix)
+
+Journey Planner
+^^^^^^^^^^^^^^^^^^
+
+The `journey_planner` function computes the optimal journey between two stations, considering any service disruptions:
+
+.. code-block:: python
+
+    from londontube.web_query import journey_planner
+
+    # Example journey planning from 'Aldgate' to 'Angel'
+    journey_result = journey_planner('Aldgate', 'Angel')
+    print(journey_result)
+
+    # The output will be a dictionary with the journey details.
+
+Plotting the Journey Path
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To visualize the journey path, you can utilize the `plot_journey` function along with the `journey_planner`:
+
+.. code-block:: python
+
+    from londontube.web_query import plot_journey, journey_planner
+
+    # Plot the journey after planning
+    journey_result = journey_planner('Aldgate', 'Angel')
+    plot_journey(journey_result['path'], journey_result['station_names'])
+
+    # This will display and save a plot of the journey path.
+
+Main Function
+^^^^^^^^^^^^^^^
+
+When running the `journey_planner.py` script, you can specify the start, destination, and setoff date for your journey. Additionally, you can enable plotting to visualize the journey path:
+
+.. code-block:: bash
+
+    # To plan a journey from 'Aldgate' to 'Angel' with plotting enabled
+    python journey_planner.py Aldgate Angel --plot
+
+Please note that you should replace '&' with 'and' when specifying station names, and if you're starting or ending at 'Heathrow Terminals 1, 2 & 3', only type "Heathrow Terminals 1
 
 distant_neighbours_efficiency Usage and Reproducibility
 --------------------------------------------------------
