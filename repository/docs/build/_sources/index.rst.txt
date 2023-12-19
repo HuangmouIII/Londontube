@@ -19,11 +19,15 @@ Welcome to londontube package's documentation!
    :undoc-members:
    :show-inheritance:
 
-.. .. automodule:: journey-planner 
-..    :members:
-..    :undoc-members:
-..    :show-inheritance:
+.. automodule:: journey_planner 
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
+.. automodule:: web_query
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Indices and tables
 ==================
