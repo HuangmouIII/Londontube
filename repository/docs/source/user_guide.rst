@@ -98,3 +98,53 @@ Using Dijkstra's Algorithm
     print(path, cost) 
     # results: [0, 1, 2] 2
 
+
+journey_planner User Guide
+---------------------------
+
+
+
+web_query User Guide
+---------------------
+
+
+
+distant_neighbours_efficiency User Guide
+-----------------------------------------
+
+
+distant_neighbours_efficiency Usage and Reproducibility
+--------------------------------------------------------
+
+Compare two method running speed for two function Distant Neighbours funtion - User Guide
+
+Prerequisites:
+^^^^^^^^^^^^^^^
+
+Python libraries: NumPy, Matplotlib, Pandas ,timeit
+Install Libraries (if needed): londontube package
+
+Copy code
+pip install numpy matplotlib pandas
+Script Overview:
+
+Fetches station data and connectivity data for the London Tube network.
+Populates a weight matrix with the fetched data.
+Analyzes performance of two methods:
+weight_matrix_network.distant_neighbours()
+provided_distant_neighbours()
+
+Usage
+^^^^^^
+Modify station_list to include desired stations.
+Calculate speed for two method and plot which one is faster.
+
+Output
+^^^^^^^
+Execution times written to distant_neighbours_times.md.
+Performance plot displayed with logarithmic scales.
+
+Note
+^^^^
+Ensure the londontube package is properly installed.
+Contact support for any issues or questions.
